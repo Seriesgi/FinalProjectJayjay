@@ -1,0 +1,60 @@
+plugins {
+    id 'java'
+}
+
+group = 'id.seriesgi'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    cucumberVersion = '7.20.1'
+    seleniumVersion = '4.27.0'
+    restAssuredVersion = '5.5.0'
+}
+
+dependencies {
+    testImplementation "io.cucumber:cucumber-java:${cucumberVersion}"
+    testImplementation "io.cucumber:cucumber-junit-platform-engine:${cucumberVersion}"
+    testImplementation 'org.junit.platform:junit-platform-suite:1.11.4'
+    testImplementation "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
+    testImplementation "io.github.bonigarcia:webdrivermanager:5.9.2"
+    testImplementation "io.rest-assured:rest-assured:${restAssuredVersion}"
+    testImplementation 'org.slf4j:slf4j-simple:2.0.16'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+test {
+    useJUnitPlatform()
+    systemProperty 'cucumber.plugin', 'pretty,html:reports/cucumber/all.html,json:reports/cucumber/all.json'
+    systemProperty 'cucumber.publish.quiet', 'true'
+}
+
+tasks.register('apiTest', Test) {
+    group = 'verification'
+    description = 'Runs all Cucumber scenarios tagged @api.'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform()
+    systemProperty 'cucumber.filter.tags', '@api'
+    systemProperty 'cucumber.plugin', 'pretty,html:reports/cucumber/api.html,json:reports/cucumber/api.json'
+    systemProperty 'cucumber.publish.quiet', 'true'
+}
+
+tasks.register('webTest', Test) {
+    group = 'verification'
+    description = 'Runs all Cucumber scenarios tagged @web.'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform()
+    systemProperty 'cucumber.filter.tags', '@web'
+    systemProperty 'cucumber.plugin', 'pretty,html:reports/cucumber/web.html,json:reports/cucumber/web.json'
+    systemProperty 'cucumber.publish.quiet', 'true'
+}
